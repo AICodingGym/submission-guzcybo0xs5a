@@ -592,13 +592,14 @@ def drange(dstart, dend, delta):
 
 
 def _wrap_in_tex(text):
-    p = r'([a-zA-Z]+)'
-    ret_text = re.sub(p, r'}$\1$\\mathdefault{', text)
+    if not text:
+        return ''
 
-    # Braces ensure dashes are not spaced like binary operators.
-    ret_text = '$\\mathdefault{'+ret_text.replace('-', '{-}')+'}$'
-    ret_text = ret_text.replace('$\\mathdefault{}$', '')
-    return ret_text
+    chunks = re.split(r'(\s+)', text)
+    return '$' + ''.join(
+        (chunk if chunk.isspace()
+         else r'\mathdefault{' + chunk.replace('-', '{-}') + '}')
+        for chunk in chunks if chunk) + '$'
 
 
 ## date tickers and formatters ###
