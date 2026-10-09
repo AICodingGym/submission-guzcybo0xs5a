@@ -2366,10 +2366,17 @@ class ToolLineHandles:
             line_props = {}
         line_props.update({'visible': False, 'animated': useblit})
 
-        line_fun = ax.axvline if self.direction == 'horizontal' else ax.axhline
         self._line_props = line_props
 
-        self.artists = [line_fun(p, **line_props) for p in positions]
+        if self.direction == 'horizontal':
+            transform = ax.get_xaxis_transform()
+            lines = [Line2D([p, p], [0, 1], transform=transform, **line_props)
+                     for p in positions]
+        else:
+            transform = ax.get_yaxis_transform()
+            lines = [Line2D([0, 1], [p, p], transform=transform, **line_props)
+                     for p in positions]
+        self.artists = [ax.add_artist(line) for line in lines]
 
     @property
     def positions(self):
